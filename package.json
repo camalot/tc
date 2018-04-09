@@ -31,11 +31,19 @@
     },
     "win": {
       "target": [
-        "squirrel"
+        "appx",
+        "portable"
       ]
     },
     "squirrelWindows": {
       "iconUrl": "https://github.com/mccxiv/tc/blob/master/build/icon.ico?raw=true"
+    },
+    "appx": {
+      "backgroundColor": "#452c60",
+      "applicationId": "TcApp",
+      "identityName": "TcApp",
+      "displayName": "Tc",
+      "publisherDisplayName": "Mccxiv"
     }
   },
   "eslintConfig": {

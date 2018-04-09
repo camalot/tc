@@ -54,6 +54,7 @@ gulp.task('build', function () {
 function build (platform) {
   if (platform === 'windows') {
     shell.exec('npm run dist:windows')
+    shell.mv('dist/*.appx', '_dist/')
     shell.mv('dist/squirrel-windows/*', '_dist/')
     shell.find('_dist').filter((f) => f.endsWith('.exe')).forEach((f) => {
       shell.mv(f, f.replace('Tc Setup ', 'tc-setup-win-'))
