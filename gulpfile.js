@@ -48,16 +48,19 @@ gulp.task('build', function () {
       build('windows')
       break
   }
-  shell.rm('-rf', 'dist')
+  // shell.rm('-rf', 'dist')
 })
 
 function build (platform) {
   if (platform === 'windows') {
     shell.exec('npm run dist:windows')
     shell.mv('dist/*.appx', '_dist/')
-    shell.mv('dist/squirrel-windows/*', '_dist/')
+    shell.mv('dist/*.exe', '_dist/')
     shell.find('_dist').filter((f) => f.endsWith('.exe')).forEach((f) => {
-      shell.mv(f, f.replace('Tc Setup ', 'tc-setup-win-'))
+      shell.mv(f, f.replace('Tc ', 'tc-portable-win-'))
+    })
+    shell.find('_dist').filter((f) => f.endsWith('.exe')).forEach((f) => {
+      shell.mv(f, f.replace('Tc-', 'tc-win'))
     })
   } else if (platform === 'linux') {
     shell.exec('npm run dist:linux')
