@@ -1,7 +1,6 @@
 import settings from '../settings/settings'
-const electron = require('electron')
-var main = electron.remote.getCurrentWindow()
+import {remote} from 'electron'
 
-export default function setOnTop() {
-  main.setAlwaysOnTop(settings.appearance.alwaysOnTop)
+export default function setOnTop () {
+  remote.getCurrentWindow().setAlwaysOnTop(settings.appearance.alwaysOnTop)
 }

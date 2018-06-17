@@ -135,13 +135,13 @@ angular.module('tc').directive('chatTabs', ($timeout, messages) => {
       arr.splice(toIndex, 0, element)
     }
 
-    async function getStreams() {
+    async function getStreams () {
       for (const channel of settings.channels) {
         scope.m.streams[channel] = await api.stream(channel)
       }
     }
 
-    function liveStreamType(channel) {
+    function liveStreamType (channel) {
       if (
         !scope.m.streams[channel] ||
         !scope.m.streams[channel].stream
@@ -150,7 +150,7 @@ angular.module('tc').directive('chatTabs', ($timeout, messages) => {
       return scope.m.streams[channel].stream.stream_type
     }
 
-    function cleanup() {
+    function cleanup () {
       clearInterval(getStreamsInterval)
     }
   }
