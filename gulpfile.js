@@ -59,7 +59,7 @@ function build (platform) {
     shell.find('_dist').filter((f) => f.endsWith('.exe')).forEach((f) => {
       shell.mv(f, f.replace('Tc ', 'tc-portable-win-'))
     })
-    shell.find('_dist').filter((f) => f.endsWith('.exe')).forEach((f) => {
+    shell.find('_dist').filter((f) => f.endsWith('.appx')).forEach((f) => {
       shell.mv(f, f.replace('Tc-', 'tc-win'))
     })
   } else if (platform === 'linux') {
