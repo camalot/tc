@@ -48,7 +48,7 @@ gulp.task('build', function () {
       build('windows')
       break
   }
-  // shell.rm('-rf', 'dist')
+  shell.rm('-rf', 'dist')
 })
 
 function build (platform) {
