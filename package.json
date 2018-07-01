@@ -40,9 +40,10 @@
     },
     "appx": {
       "backgroundColor": "#452c60",
-      "applicationId": "TcApp",
-      "identityName": "TcApp",
+      "applicationId": "Mccxiv.Tc",
+      "identityName": "56492Mccxiv.Tc",
       "displayName": "Tc",
+      "publisher": "CN=ED9EB44C-C921-4115-A659-0EBB105DB8B1",
       "publisherDisplayName": "Mccxiv"
     }
   },
