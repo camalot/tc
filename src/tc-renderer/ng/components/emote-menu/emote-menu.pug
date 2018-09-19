@@ -4,7 +4,7 @@ md-whiteframe.md-whiteframe-z4.container(ng-if='vm.visible', mobx-autorun)
       .category-label(ng-if='category.emotes.length') {{category.label}}
       .emotes
         img.emoticon(
-          ng-repeat='emote in category.emotes',
+          ng-repeat='emote in category.emotes | filter: vm.filterEmote',
           src='{{emote.url}}',
           data-emote-name='{{emote.emote}}',
           ng-click='vm.choose(emote.emote)'

@@ -5,6 +5,8 @@ import replacePhrases from '../../../lib/transforms/replace-phrases'
 import {getChatterNames} from '../../../lib/chatters'
 import emotesFfz from '../../../lib/emotes/ffz'
 import emotesBttv from '../../../lib/emotes/bttv'
+import replacements from '../../../lib/data/replacements.json'
+import store from '../../../store'
 
 angular.module('tc').component('chatInput', {template, controller})
 
@@ -39,15 +41,24 @@ function controller ($scope, $element, session, irc, messages, emotesTwitch, set
     const bttvEmotes = grabEmotes(emotesBttv(channel)).sort()
     const ffzEmotes = grabEmotes(emotesFfz(channel)).sort()
     const twitchEmotes = grabEmotes(emotesTwitch).sort()
-    return [].concat(twitchEmotes, bttvEmotes, ffzEmotes, names, atNames)
+    const replacementsKeys = []
+      .concat(
+        Object.keys(replacements || {}),
+        Object.keys(store.settings.state.shortcuts || {})
+      )
+      .map(x => `:${x}:`).sort()
+    return [].concat(
+      twitchEmotes, bttvEmotes,
+      ffzEmotes, names, atNames,
+      replacementsKeys)
 
     function grabEmotes (arr) {
-      return arr.map((e) => e.emote)
+      return arr.map((e) => ':' + e.emote)
     }
   }
 
   vm.input = () => {
-    if (vm.emoteMenu) vm.emoteMenu = false
+    if (vm.emoteMenu) vm.hideEmoteMenu()
     const channel = settings.channels[settings.selectedTabIndex]
     if (!channel || !session.message.trim().length) return
 
@@ -75,7 +86,7 @@ function controller ($scope, $element, session, irc, messages, emotesTwitch, set
   vm.keyUp = (event) => {
     const keyCode = event.keyCode || event.which
     const historyIndex = vm.chatHistory.indexOf(session.message)
-    if (keyCode === 38) {
+    if (keyCode === 38) { // arrow up
       if (historyIndex >= 0) {
         if (vm.chatHistory[historyIndex + 1]) {
           session.message = vm.chatHistory[historyIndex + 1]
@@ -88,13 +99,30 @@ function controller ($scope, $element, session, irc, messages, emotesTwitch, set
           session.message = vm.chatHistory[0]
         }
       }
-    } else if (keyCode === 40) {
+    } else if (keyCode === 40) { // arrow down
       if (historyIndex >= 0) {
         if (vm.chatHistory[historyIndex - 1]) {
           session.message = vm.chatHistory[historyIndex - 1]
         } else {
           session.message = ''
         }
+      }
+    } else if (keyCode === 186) { // : (colon)
+      vm.showEmoteMenu()
+    } else if (keyCode === 32 && vm.emoteMenu) {
+      vm.hideEmoteMenu()
+    } else {
+      let startPos = input.selectionStart
+      // find the current word
+      let word = getWordAt(input.value, startPos)
+      let pattern = /:(\w+)/
+      // see if it is a :emote
+      let match = pattern.exec(word)
+      if (match && match.length > 1) {
+        let query = match[1].slice(0)
+        vm.showEmoteMenu(query)
+      } else {
+        vm.hideEmoteMenu()
       }
     }
   }
@@ -104,13 +132,41 @@ function controller ($scope, $element, session, irc, messages, emotesTwitch, set
     if (msg === '/r ') {
       if (lastWhisperer) session.message = `/w ${lastWhisperer} `
       else session.message = '/w '
-    } else if (msg.startsWith('/') || msg.endsWith(':')) {
+    } else if (msg.startsWith('/') || /(^|\s):\w+:(\s|$)/.test(msg)) {
       session.message = replacePhrases(msg)
+    }
+  }
+  vm.showEmoteMenu = function (filter) {
+    vm.emoteMenu = true
+    if (session.emoteMenu) {
+      session.emoteMenu.filter = filter
+    }
+  }
+
+  vm.hideEmoteMenu = function () {
+    vm.emoteMenu = false
+    if (session.emoteMenu) {
+      session.emoteMenu.filter = ''
     }
   }
 
   vm.toggleEmoteMenu = function () {
-    vm.emoteMenu = !vm.emoteMenu
+    if (vm.emoteMenu) {
+      vm.hideEmoteMenu()
+    } else {
+      vm.showEmoteMenu('')
+    }
+  }
+
+  function getWordAt (str, pos) {
+    str = String(str)
+    pos = (Number(pos) >>> 0) - 1
+    let left = str.slice(0, pos + 1).search(/\S+$/)
+    let right = str.slice(pos).search(/\s/)
+
+    return right < 0
+      ? str.slice(left)
+      : str.slice(left, right + pos)
   }
 
   function listenToWhispers (from) {
@@ -123,7 +179,7 @@ function controller ($scope, $element, session, irc, messages, emotesTwitch, set
 
   function keyupHandlerCloseEmoteMenu (e) {
     if (e.keyCode === 27 && vm.emoteMenu) {
-      vm.emoteMenu = false
+      vm.hideEmoteMenu()
       $scope.$digest()
     }
   }
