@@ -132,7 +132,7 @@ function controller ($scope, $element, session, irc, messages, emotesTwitch, set
     if (msg === '/r ') {
       if (lastWhisperer) session.message = `/w ${lastWhisperer} `
       else session.message = '/w '
-    } else if (msg.startsWith('/') || /(^|\s):\w+:(\s|$)/.test(msg)) {
+    } else if (msg.startsWith('/') || /(^|\s):\w+(:(\s|$))?/.test(msg)) {
       session.message = replacePhrases(msg)
     }
   }
