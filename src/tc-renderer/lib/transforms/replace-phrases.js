@@ -8,11 +8,17 @@ const colonRegex = /:[a-z0-9\-_]+:/ig
 const emoteRegex = /:\w+/ig
 
 export default function replacePhrases (string) {
-  const emotes = getAllCachedEmotes().map(c => c.emotes.map(e => e.emote))
+  const emotes = [].concat(...getAllCachedEmotes()
+    .map(c => c.emotes))
+    .map(e => {
+      let x = {}
+      x[e.emote.toLowerCase()] = e.emote
+      return x
+    })
   const sources = [replacements, store.settings.state.shortcuts].concat(emotes)
   const phrasesAndEmojis = Object.assign({}, emojis, ...sources)
   const phrases = Object.assign({}, ...sources)
-  console.log(sources)
+  console.log(phrases)
   string = string.replace(slashRegex, s => {
     const phrase = s.substring(1).toLowerCase()
     if (phrases[phrase]) return phrases[phrase]
